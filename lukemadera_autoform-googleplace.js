@@ -23,13 +23,14 @@ var afGooglePlace ={
       },
       fullAddress: val,
       street: '',
+      streetNumber: '',
       city: '',
       state: '',
       zip: '',
       country: '',
       placeId: ''
     };
-    
+
     if(place && place.geometry && place.geometry.location) {
       loc =self.parseGoogleAddressComponent(place.address_components, {});
 
@@ -69,7 +70,7 @@ var afGooglePlace ={
     var address ={};
     //go through all address components and pull out the matching types and map them to what we want (city, state)
     var map ={
-      'street_number': 'street',
+      'street_number': 'streetNumber',
       'route': 'street',
       'locality': 'city',
       'administrative_area_level_1': 'state',
@@ -82,23 +83,11 @@ var afGooglePlace ={
         //if have a map type we want
         if(addressComponents[ii].types.indexOf(xx) >-1) {
           //have to join street number and route together
-          if((xx ==='street_number' || xx ==='route') && address.street !==undefined) {
-            //prepend
-            if(xx ==='street_number') {
-              address.street =addressComponents[ii].short_name + ' ' +address.street;
-            }
-            //append
-            else if(xx ==='route') {
-              address.street =address.street + ' ' + addressComponents[ii].short_name;
-            }
+          if(xx ==='locality') {
+            address[map[xx]] =addressComponents[ii].long_name;
           }
           else {
-            if(xx ==='locality') {
-              address[map[xx]] =addressComponents[ii].long_name;
-            }
-            else {
-              address[map[xx]] =addressComponents[ii].short_name;
-            }
+            address[map[xx]] =addressComponents[ii].short_name;
           }
         }
       }
@@ -445,7 +434,7 @@ Template.afGooglePlace.rendered =function() {
       afGooglePlace.getPredictions(templateInst, options, {noShow:true, setVal:true});
     }
     else {
-      afGooglePlace.hide(templateInst,{});  
+      afGooglePlace.hide(templateInst,{});
     }
 
   }
